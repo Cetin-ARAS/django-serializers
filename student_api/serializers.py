@@ -3,8 +3,8 @@ from .models import Student
 
 
 class StudentSerializer(serializers.Serializer):
-    first_name = serializers.Charfield(max_lenght=50)
-    last = serializers.Charfield(max_lenght=50)
+    first_name = serializers.CharField(max_length=50)
+    last_name = serializers.CharField(max_length=50)
     number = serializers.IntegerField()
     age = serializers.IntegerField()
 
