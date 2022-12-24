@@ -14,6 +14,40 @@ def home(request):
 # http methods----->
 # GET,(DB den veri çağırma, public)
 # POST(DB de değişiklil, creative, privative)
-# PUL(DB kayıt değişikliği)
+# PUT(DB kayıt değişikliği)
 # DELETE(DB de kasyıt silme)
 # PATCH(tek fielda değişiklik yapılınca sadece onu update yapar DB)
+
+@api_view(['GET'])
+def students_list(request):
+    students = Student.objects.all()
+    # print(students)
+    serializer = StudentSerializer(students, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def student_create(request):
+    serializer =StudentSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        message = {
+            "message": f'Student updated succesfully...'
+        }
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def student_detail(request, pk):
+  
+    student = get_object_or_404.get(id=pk)
+    # student = Student.object.get(id=pk)
+    serializer = StudentSerializer(student)
+    return Response(serializer.data)   
+
+@api_view(['PUT'])
+def student_update(request,pk):
+    student = get_object_or_404.get(id=pk)
+    serializer = StudentSerializer(instance=student, data=request.data)
+
+
+
