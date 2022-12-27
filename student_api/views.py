@@ -126,3 +126,5 @@ def student_api_get_update_delete(request, pk):
         return Response(data)
 #!########################CLASS BASED VİEWS####################################
 
+#! APIVIEW
+
