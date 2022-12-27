@@ -1,13 +1,21 @@
-# rest framework import
-from rest_framework.decorators import api_view
+# rest framework imports
+from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import render, HttpResponse, get_object_or_404
-#my imports
+from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView, mixins, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.viewsets import ModelViewSet
+
+
+# my imports
 from .models import Student, Path
 from .serializers import StudentSerializer, PathSerializer
 
-#!########################FUNCTİON BASED VİEWS####################################
+
+
+
+#!#################### FUNCTION BASED VIEWS ########################################
 
 @api_view()  # default GET
 def home(requst):
@@ -124,7 +132,108 @@ def student_api_get_update_delete(request, pk):
             "message": f"Student {student.last_name} deleted successfully"
         }
         return Response(data)
-#!########################CLASS BASED VİEWS####################################
+    
+
+#!#################### CLASS BASED VIEWS ########################################
 
 #! APIVIEW
+class StudentListCreate(APIView):
+    
+    def get(self, request):
+        students = Student.objects.all()
+        serializer = StudentSerializer(students, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = StudentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                "message": f"Student {serializer.validated_data.get('first_name')} saved successfully!"}
+            return Response(data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
+class StudentDetail(APIView):
+    
+    def get_obj(self, pk):
+        return get_object_or_404(Student, pk=pk)
+    
+    def get(self, request, pk):
+        student = self.get_obj(pk)
+        serializer = StudentSerializer(student)
+        return Response(serializer.data)
+    
+    def put(self, request, pk):
+        student = self.get_obj(pk)
+        serializer = StudentSerializer(student, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            data = {
+                "message": f"Student {student.last_name} updated successfully"
+            }
+            return Response(data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk):
+        student = self.get_obj(pk)
+        student.delete()
+        data = {
+            "message": f"Student {student.last_name} deleted successfully"
+        }
+        return Response(data)
+    
+
+#! GENERICAPIView and Mixins
+""" #? GenericApıView
+# One of the key benefits of class-based views is the way they allow you to compose bits of reusable behavior. REST framework takes advantage of this by providing a number of pre-built views that provide for commonly used patterns.
+# GenericAPIView class extends REST framework's APIView class, adding commonly required behavior for standard list and detail views.
+#? Mixins
+# - ListModelMixin
+#     - list method
+# - CreateModelMixin
+#     - create method
+# - RetrieveModelMixin
+#     - retrieve method
+# - UpdateModelMixin
+#     - update method
+# - DestroyModelMixin
+#     - destroy method 
+    
+class StudentGAV(mixins.ListModelMixin, mixins.CreateModelMixin, GenericAPIView):
+    
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    
+    
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+    
+class StudentDetailGAV(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, GenericAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+    
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+    
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs) """
+    
+    
+#! Concrete Views
+
+class StudentCV(ListCreateAPIView):
+    
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    
+class StudentDetailCV(RetrieveUpdateDestroyAPIView):
+    
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
