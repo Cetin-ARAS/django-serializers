@@ -17,6 +17,6 @@ urlpatterns = [
     # path("student-detail/<int:pk>/", student_detail, name='detail'),
     # path("student-update/<int:pk>/", student_update, name='update'),
     # path("student-delete/<int:pk>/", student_delete, name='delete'),
-    path('student', student_api),
+    path('student/', student_api),
     path('student/<int:pk>', student_api_get_update_delete)
 ]
