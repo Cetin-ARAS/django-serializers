@@ -1,21 +1,29 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.viewsets import ModelViewSet
+
 
 from .models import Todo
 from .serializers import TodoSerializer
+
+
+@api_view()
+def todo_home(request):
+    return Response({'home': 'This is todo home page'})
 
 
 @api_view(['GET', 'POST'])
 def todo_list_create(request):
     if request.method == 'GET':
         todos = Todo.objects.filter(is_done=False)
-        serializer =TodoSerializer(todos, many=True)
+        serializer = TodoSerializer(todos, many=True)
         return Response(serializer.data)
 
-    if request.method == 'POST'
+    elif request.method == 'POST':
         serializer = TodoSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
