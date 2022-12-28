@@ -3,7 +3,7 @@ from django.db import models
 
 class Todo(models.Model):
     PRIORITY = (
-        (1, 'High'),
+        (1, 'High'), # db, kullanıcı
         (2, 'Medium'),
         (3, 'Low')
     )
